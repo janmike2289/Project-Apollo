@@ -10,6 +10,7 @@ internal static class DapperTypeHandlers
         SqlMapper.AddTypeHandler(new GuidHandler());
         SqlMapper.AddTypeHandler(new DecimalHandler());
         SqlMapper.AddTypeHandler(new BooleanHandler());
+        SqlMapper.AddTypeHandler(new DateTimeOffsetHandler());
     }
 
     private sealed class GuidHandler : SqlMapper.TypeHandler<Guid>
@@ -47,6 +48,22 @@ internal static class DapperTypeHandlers
         {
             parameter.DbType = DbType.Int64;
             parameter.Value = value ? 1L : 0L;
+        }
+    }
+
+    private sealed class DateTimeOffsetHandler : SqlMapper.TypeHandler<DateTimeOffset>
+    {
+        public override DateTimeOffset Parse(object value) => value switch
+        {
+            DateTimeOffset offset => offset,
+            DateTime dateTime => new DateTimeOffset(DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)),
+            _ => DateTimeOffset.Parse(value.ToString()!)
+        };
+
+        public override void SetValue(IDbDataParameter parameter, DateTimeOffset value)
+        {
+            parameter.DbType = DbType.String;
+            parameter.Value = value.ToString("O");
         }
     }
 }

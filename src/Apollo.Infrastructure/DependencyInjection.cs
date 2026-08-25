@@ -19,7 +19,7 @@ public static class DependencyInjection
         DapperTypeHandlers.Register();
 
         services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
-        services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+        services.AddScoped<IChangeTicketRepository, ChangeTicketRepository>();
         services.AddSingleton<ISqlConnectionFactory, SqliteConnectionFactory>();
         services.AddScoped<IDapperQuery, DapperQuery>();
 
