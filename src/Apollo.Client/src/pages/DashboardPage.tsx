@@ -19,9 +19,6 @@ export function DashboardPage() {
           <p className="text-sm font-medium text-muted-foreground">Overview</p>
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         </div>
-        <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90">
-          New review
-        </button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

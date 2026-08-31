@@ -30,7 +30,11 @@ export function RequirementsPage() {
           <p className="text-sm font-medium text-muted-foreground">Portfolio</p>
           <h2 className="text-3xl font-bold tracking-tight">Requirements Master</h2>
         </div>
-        <button className="rounded-md border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent">
+        <button
+          type="button"
+          onClick={() => window.location.assign('/create-requirement')}
+          className="rounded-md border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+        >
           Add requirement
         </button>
       </div>

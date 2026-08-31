@@ -1,10 +1,11 @@
 import './App.css';
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/pages/AppSideBar";
+import { CreateRequirementPage } from "@/pages/CreateRequirementPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { RequirementsPage } from "@/pages/RequirementsPage";
 
-const currentPage = window.location.pathname === '/requirements' ? 'requirements' : 'dashboard';
+const currentPage = window.location.pathname;
 
 export default function App() {
   const page = currentPage;
@@ -20,7 +21,9 @@ export default function App() {
           </header>
 
           <div className="flex-1 p-6 overflow-y-auto">
-            {page === 'requirements' ? <RequirementsPage /> : <DashboardPage />}
+            {page === '/requirements' && <RequirementsPage />}
+            {page === '/create-requirement' && <CreateRequirementPage />}
+            {page !== '/requirements' && page !== '/create-requirement' && <DashboardPage />}
           </div>
         </main>
       </div>
