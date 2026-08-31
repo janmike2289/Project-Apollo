@@ -1,12 +1,29 @@
 import './App.css';
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/pages/AppSideBar";
+import { DashboardPage } from "@/pages/DashboardPage";
+import { RequirementsPage } from "@/pages/RequirementsPage";
 
-const App = () => {
+const currentPage = window.location.pathname === '/requirements' ? 'requirements' : 'dashboard';
+
+export default function App() {
+  const page = currentPage;
+
   return (
-    <div className="content">
-      <h1>Rsbuild with React</h1>
-      <p>Start building amazing things with Rsbuild.</p>
-    </div>
-  );
-};
+    <SidebarProvider>
+      <div className="flex min-h-screen w-screen bg-background text-foreground">
+        <AppSidebar />
 
-export default App;
+        <main className="flex-1 flex flex-col min-h-screen">
+          <header className="flex h-14 items-center gap-4 border-b px-6 bg-card">
+            <SidebarTrigger />
+          </header>
+
+          <div className="flex-1 p-6 overflow-y-auto">
+            {page === 'requirements' ? <RequirementsPage /> : <DashboardPage />}
+          </div>
+        </main>
+      </div>
+    </SidebarProvider>
+  );
+}
