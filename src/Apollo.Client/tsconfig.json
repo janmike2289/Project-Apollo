@@ -17,16 +17,7 @@
 
     /* type checking */
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
-
-    "resolvePackageJsonImports": true,
-
-     /* paths needs to be  */
-    "paths": {
-      "@/components/*": ["./src/@/components/*"],
-      "@/hooks/*" : ["./src/@/hooks/*"],
-      "@/pages/*" : ["./src/pages/*"],
-    }
+    "noUnusedParameters": true
   },
   "include": ["src"]
 }

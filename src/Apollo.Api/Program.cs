@@ -5,10 +5,15 @@ using Apollo.Infrastructure;
 using Apollo.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
+
+//--------------------------------------------default program builder for web app, do not touch-------------------------------------
 var builder = WebApplication.CreateBuilder(args);
 
+// -------------Services (Add the built in tools/components, and libraries as well as services to the application) -----------------
+
+builder.Services.AddValidation(); // New in .NET 10 built-in endpoint validation
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(); // modern api support
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -21,38 +26,19 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
-var app = builder.Build();
+builder.Services.AddCors();
 
-await using (var scope = app.Services.CreateAsyncScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.EnsureSchemaAsync();
+var app = builder.Build(); //Build the web api application
 
-    if (!await db.ChangeTickets.AnyAsync())
-    {
-        db.ChangeTickets.AddRange(
-            new ChangeTicket(
-                "Deploy payment API v2",
-                "Roll out payment API v2 behind the existing gateway with a 10% canary.",
-                ChangeType.Normal,
-                ChangePriority.High,
-                "alex.nguyen",
-                "sre-oncall",
-                "Deploy canary, monitor error rate, promote to 100%.",
-                "Revert gateway route to payment API v1.",
-                DateTimeOffset.UtcNow.AddDays(1),
-                DateTimeOffset.UtcNow.AddDays(1).AddHours(2)),
-            new ChangeTicket(
-                "Emergency firewall rule for vendor VPN",
-                "Add a temporary allow rule for the vendor support VPN.",
-                ChangeType.Emergency,
-                ChangePriority.Critical,
-                "priya.patel",
-                "network-ops"));
-        await db.SaveChangesAsync();
-    }
-}
+//-------------------------------------------------------Middleware Pipeline------------------------------------------------------------------------
+//Note: The order of the middleware is important. The middleware is executed in the order that it is added to the pipeline.
 
+
+
+
+//CORS is an HTTP-header based mechanism that allows a server to indicate any origins (domain, scheme, or port) other than its own from which a browser should permit loading resources
+//In this case, we are allowing the client (react) to access resource if it is coming from the origin of 4200
+//app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200", "https://localhost:4200"));
 app.UseCors();
 
 if (app.Environment.IsDevelopment())
