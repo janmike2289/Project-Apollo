@@ -29,65 +29,30 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();             // 3. Map the OpenAPI JSON endpoint (/openapi/v1.json)
+    app.MapOpenApi();             //Map the OpenAPI JSON endpoint (/openapi/v1.json)
     app.MapScalarApiReference(options =>
     {
         // Ensure this string perfectly mirrors your OpenAPI route structure
         options.WithOpenApiRoutePattern("/openapi/v1.json"); 
         options.Title = "My Custom API Docs";
-        options.Theme = ScalarTheme.DeepSpace; // Choose from: Mars, Purple, DeepSpace, etc.
+        options.Theme = ScalarTheme.Kepler; // Choose from: Mars, Purple, DeepSpace, etc.
         options.Layout = ScalarLayout.Modern; // Standard or Modern layouts
         options.DefaultHttpClient = new(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });  // 4. Map the Scalar UI endpoint (/scalar/v1)
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:5000", "https://localhost:5000"));
 
-// custom endpoint for testing
-
-// Mock In-Memory Database
-var todos = new List<TodoItem>
-{
-    new(1, "Learn .NET 10", false),
-    new(2, "Build a Minimal API", false)
-};
-
-// --- API ENDPOINTS ---
-
-// GET: Fetch all items
-app.MapGet("RM/todos", () => Results.Ok(todos));
-
-// GET: Fetch a single item by ID
-app.MapGet("RM/todos/{id:int}", (int id) =>
-{
-    var todo = todos.FirstOrDefault(t => t.Id == id);
-    return todo is not null ? Results.Ok(todo) : Results.NotFound();
-});
-
-// POST: Create a new item with native .NET 10 parameter validation
-app.MapPost("RM/todos", (CreateTodoRequest request) =>
-{
-    var newTodo = new TodoItem(todos.Count + 1, request.Title, false);
-    todos.Add(newTodo);
-    return Results.Created($"/todos/{newTodo.Id}", newTodo);
-});
-
+//--------------------Endpoints----------------------------------
 
 app.MapChangeManagementEndpoints(); // Map RM endpoints
+app.MapTestEndpoints(); // Map Test endpoints
 
 app.Run();
 
 // --- DATA MODELS ---
 
-public record TodoItem(int Id, string Title, bool IsCompleted);
 
-// Input model using standard attributes for automatic compilation-time validation
-public record CreateTodoRequest(
-    [Required(ErrorMessage = "Title is required")] 
-    [StringLength(100, MinimumLength = 3)] 
-    string Title
-);
 
 
