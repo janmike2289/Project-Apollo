@@ -30,6 +30,8 @@ const chartData = [
   { label: 'At Risk', value: 10, color: '#e57373' },
 ];
 
+const deliveryHealth = 76;
+
 const toneMap = {
   primary: '#90caf9',
   warning: '#ffcc80',
@@ -84,35 +86,42 @@ export default function Dashboard() {
           <Card sx={{ background: '#e3f2fd', color: '#0f172a', border: '1px solid rgba(148, 163, 184, 0.2)', height: '100%' }}>
             <CardContent>
               <Typography variant="h5" sx={{ mb: 3 }}>
-                Requirement Status
+                Delivery Health
               </Typography>
 
               <Stack direction="row" alignItems="center" justifyContent="center">
-                <Box
-                  sx={{
-                    width: 220,
-                    height: 220,
-                    background: chartGradient,
-                    borderRadius: '50%',
-                    position: 'relative',
-                    boxShadow: 'inset 0 0 0 12px #e3f2fd',
-                  }}
-                >
+                <Box sx={{ width: 220, height: 180, position: 'relative' }}>
+                  <svg viewBox="0 0 200 120" width="100%" height="100%" preserveAspectRatio="none">
+                    <path
+                      d="M 20 100 A 80 80 0 0 1 180 100"
+                      fill="none"
+                      stroke="rgba(148, 163, 184, 0.35)"
+                      strokeWidth="16"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M 20 100 A 80 80 0 0 1 180 100"
+                      fill="none"
+                      stroke="#4dabf7"
+                      strokeWidth="16"
+                      strokeLinecap="round"
+                      strokeDasharray={Math.PI * 80}
+                      strokeDashoffset={Math.PI * 80 * (1 - deliveryHealth / 100)}
+                    />
+                  </svg>
+
                   <Box
                     sx={{
                       position: 'absolute',
-                      inset: 26,
-                      background: '#e3f2fd',
-                      borderRadius: '50%',
+                      inset: 'auto 0 8px 0',
                       display: 'flex',
+                      flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      flexDirection: 'column',
-                      border: '1px solid rgba(148, 163, 184, 0.2)',
                     }}
                   >
-                    <Typography variant="h5" fontWeight={700}>{total}%</Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.7 }}>Total</Typography>
+                    <Typography variant="h4" fontWeight={700}>{deliveryHealth}%</Typography>
+                    <Typography variant="caption" sx={{ opacity: 0.7 }}>On track</Typography>
                   </Box>
                 </Box>
               </Stack>
