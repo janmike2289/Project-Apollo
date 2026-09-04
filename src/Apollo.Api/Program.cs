@@ -1,8 +1,6 @@
-using System.ComponentModel.DataAnnotations;
-using Apollo.Domain;
-using Apollo.Domain.Repositories;
-using Apollo.Infrastructure;
+using Apollo.Domain.Interface;
 using Apollo.Infrastructure.Persistence;
+using Apollo.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -12,23 +10,26 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 
-// DB connection
-// var connectionString = builder.Configuration.GetConnectionString("DevConnection") 
-//     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+//DB connection
+var connectionString = builder.Configuration.GetConnectionString("DevConnection") 
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-// builder.Services.AddDbContext<AppDbContext>(options =>
-//     options.UseSqlServer(connectionString)); // Enable retry on failure for SQL Server
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString)); // Enable retry on failure for SQL Server
 
 builder.Services.AddCors(); //add cors service
-builder.Services.AddControllers();
 builder.Services.AddOpenApi(); // 2. Register native OpenAPI services
+builder.Services.AddValidation(); // Register built-in Minimal API validation
+
+//---------------------------------------Register the repositories-----------------------------------
+builder.Services.AddScoped<ICMItemRepository, CMItemRepository>();
 
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
-{
+{   
     app.MapOpenApi();             //Map the OpenAPI JSON endpoint (/openapi/v1.json)
     app.MapScalarApiReference(options =>
     {
@@ -44,6 +45,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:5000", "https://localhost:5000"));
 
+
 //--------------------Endpoints----------------------------------
 
 app.MapChangeManagementEndpoints(); // Map RM endpoints
@@ -51,7 +53,7 @@ app.MapTestEndpoints(); // Map Test endpoints
 
 app.Run();
 
-// --- DATA MODELS ---
+
 
 
 

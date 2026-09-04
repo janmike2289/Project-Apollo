@@ -1,10 +1,19 @@
+using Apollo.Infrastructure.Persistence;
+
 public static class EPTestEndpoint
 {
     public static void MapTestEndpoints(this IEndpointRouteBuilder app)
     {
         // Grouping routes to prefix with /api/test
         var group = app.MapGroup("/api/test")
+                       .WithDescription("Endpoints for testing and demonstration purposes")
                        .WithTags("test"); // Automatically groups endpoints in OpenAPI/Swagger
+
+        group.MapGet("/test-DB", TestDatabaseConnection)
+             .WithName("TestDatabaseConnection")
+             .WithSummary("Tests DB Connection");
+            //  .Produces<string>(StatusCodes.Status200OK)
+            //  .ProducesProblem(StatusCodes.Status503ServiceUnavailable);
 
         // GET all test items
         group.MapGet("/", GetAllTestItems);
@@ -16,7 +25,15 @@ public static class EPTestEndpoint
         group.MapPost("/", CreateTestItem);
     }
 
-    // Handlers can be written as private static methods below
+    private static async Task<IResult> TestDatabaseConnection(AppDbContext db)
+    {
+        var canConnect = await db.Database.CanConnectAsync();
+    
+        return canConnect 
+            ? Results.Ok("Database connection is working!") 
+            : Results.Problem("Cannot connect to the database.", statusCode: StatusCodes.Status503ServiceUnavailable);
+    }
+
     private static IResult GetAllTestItems()
     {
         var testItems = new[] { 

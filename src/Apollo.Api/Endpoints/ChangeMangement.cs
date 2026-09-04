@@ -1,9 +1,14 @@
+using Apollo.Domain.Entities;
+using Apollo.Domain.Interface;
+using Apollo.Infrastructure.Persistence.Repositories;
+
+
 public static class EPChangeMangement
 {
     public static void MapChangeManagementEndpoints(this IEndpointRouteBuilder app)
     {
         // Grouping routes to prefix with /api/products
-        var group = app.MapGroup("/api/rm")
+        var group = app.MapGroup("/v1/rm")
                        .WithTags("rm"); // Automatically groups endpoints in OpenAPI/Swagger
 
         // GET all RM
@@ -16,22 +21,25 @@ public static class EPChangeMangement
         group.MapPost("/", CreateRM);
     }
 
-    // Handlers can be written as private static methods below
-    private static IResult GetAllRM()
+    //get all RM tickets
+    private static async Task<IResult> GetAllRM(ICMItemRepository repository, CancellationToken ct)
     {
-        var rms = new[] { new { Id = 1, Name = "Laptop" }, new { Id = 2, Name = "Mouse" } };
-        return Results.Ok(rms);
+        return Results.Ok(await repository.GetAllAsync(ct));
+    }
+    
+    //get RM ticket by id
+    private static async Task<IResult> GetRMById(int id, ICMItemRepository repository, CancellationToken ct)
+    {
+        var rm = await repository.GetByIdAsync(id, ct);
+        return rm is not null ? Results.Ok(rm) : Results.NotFound();
     }
 
-    private static IResult GetRMById(int id)
+    //Create new RM ticket
+    private static async Task<IResult> CreateRM(CMItemEntity rm, ICMItemRepository repository, CancellationToken ct)
     {
-        if (id != 1) return Results.NotFound();
-        return Results.Ok(new { Id = 1, Name = "Laptop" });
-    }
-
-    private static IResult CreateRM(CMItemDto dto)
-    {
-        // Process your data here...
-        return Results.Created($"/api/rm/1", new { Id = 1, dto.Name });
+        var id = await repository.CreateAsync(rm, ct);
+        
+        rm.Id = id;
+        return Results.Created($"/v1/rm/{id}", rm);
     }
 }
